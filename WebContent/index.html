@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>H5画板</title>
+    <link rel="stylesheet" href="css/canvas.css" type="text/css" />
+</head>
+<body>
+<span>
+    <div class="container">
+        <div class="row" id="app">
+		    <div class="header">形状</div>
+            <ul class="shaps">
+			  <li v-bind:class="{ typeactive: item.name==db.currentShap.name }" v-on:click="clickShap(db.shaps[index])" v-for="(item, index) in db.shaps">
+				{{item.chname}}
+			  </li>
+            </ul>
+		    <div class="header">形状属性</div>
+            <ul class="shaps">
+			  <li v-bind:class="{ typeactive: item.name==db.currentShap.name }" v-on:click="clickShap(db.shaps[index])" v-for="(item, index) in db.currentShap.settings">
+				{{item.chname}}
+			  </li>
+            </ul>
+		    <div class="header">通用设置</div>
+            <ul name="" class="style">
+              <li v-bind:class="{ styleactive: db.settings.isStroke }" v-on:click="setStroke(true)">描&nbsp;&nbsp;&nbsp;边</li>
+              <li v-bind:class="{ styleactive: !db.settings.isStroke }" v-on:click="setStroke(false)">填&nbsp;&nbsp;&nbsp;充</li>
+            </ul>
+            <div class="box"><span>描边颜色</span></label><input type="color" name="color" v-model="db.settings.strokeColor"></div>
+            <div class="box"><span>填充颜色</span></label><input type="color" name="color" v-model="db.settings.fillColor"></div>
+            <div class="box"><span>背景颜色</span></label><input type="color" name="color" defaultValue="red" v-model="db.settings.bgColor"></div>
+            <div class="box linewidth"><span>线宽</span><input type="number" name="number" v-model="db.settings.lineSize" max="150" min="1"></div>
+            <div class="space"></div>
+			
+                <div class="xinjian">
+                    <h6>画 板 尺 寸</h6>
+                    <div class="xinjian_width">
+                        <span>宽</span>
+                        <input type="number" max="1070" min="500" value="500">
+                    </div>
+                    <div class="xinjian_height">
+                        <span>高</span>
+                        <input type="number" max="648" min="300" value="300">
+                    </div>
+                    <input type="button" name="queding" value="确定" id="ding">
+                    <div class="xinjian_before">+</div>
+                </div>
+			<div class="shezhi" v-on:click="clickAction(db.actions[index])" v-for="(item, index) in db.actions">
+				{{ item.chname }}
+			 </div>
+        </div>
+    </div>
+    <canvas width="1070" height="648" id="bgpan" style="z-index:10;"></canvas>
+    <canvas width="1070" height="648" id="pan" style="z-index:11;"></canvas>
+</span>
+</body>
+<script src="js/shaps.js"></script>
+<script src="js/drawingboard.js"></script>
+<script src="js/vue.min.js"></script>
+<script src="js/vue-drawing-board.js"></script>
+</html>

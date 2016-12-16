@@ -6,11 +6,15 @@
 	Shap.prototype.chname="未定义";
 	Shap.prototype.startX=0;
 	Shap.prototype.startY=0;
+	Shap.prototype.borderDiv=null;
 	Shap.prototype.board=null;
 	Shap.prototype.ctx=null;
 	Shap.prototype.selected=false;
-	Shap.prototype.draw=function(){
-		alert("you shuld overwrite draw function");
+	Shap.prototype.drawBorder=function(){
+		this.borderDiv=this.board.createRectDiv(this.getBorderRect());
+	}
+	Shap.prototype.getBorderRect=function(){
+		alert("you shuld overwrite getBorderRect function");
 	}
 	Shap.prototype.onselected=function(){
 		//call back when the shap is selected
@@ -27,7 +31,9 @@
 	}
 
 	function Line(board){
-		this.board=board;this.ctx=this.board.canvasContext;
+		this.board=board;
+		this.ctx=this.board.bgCanvasContext;
+		this.curCtx=this.board.canvasContext;
 	}
 	Line.prototype=new Shap();
 	Line.prototype.name="line";
@@ -39,22 +45,23 @@
 	}
 	Line.prototype.mousemove=function(x,y){
 		this.rollback();
-		this.draw(this.startX,this.startY,x,y);
+		this.draw(this.ctx,this.startX,this.startY,x,y);
 	}
 	Line.prototype.mouseup=function(x,y){
-		
+		this.rollback();
+		this.draw(this.ctx,this.startX,this.startY,x,y);
 	}
-	Line.prototype.draw=function(x,y,x1,y1){
+	Line.prototype.draw=function(ctx,x,y,x1,y1){
 		this.board.initContext();
-		this.ctx.beginPath();
-		this.ctx.moveTo(x,y);
-		this.ctx.lineTo(x1,y1);
-		this.ctx.stroke();
+		ctx.beginPath();
+		ctx.moveTo(x,y);
+		ctx.lineTo(x1,y1);
+		ctx.stroke();
 		this.afterDraw();
 	}
 	
 	function Rect(board){
-		this.board=board;this.ctx=this.board.canvasContext;
+		this.board=board;this.ctx=this.board.bgCanvasContext;
 	}
 	Rect.prototype=new Shap();
 	Rect.prototype.name="rect";
@@ -74,17 +81,14 @@
 		this.board.initContext();
         this.ctx.beginPath();
         this.ctx.rect(x,y,x1-x,y1-y);
-        if(this.board.settings.isStroke){
+        if(this.board.settings.fillType=="stroke"){
             this.ctx.stroke();
-        }else{
+        }else if(this.board.settings.fillType=="fill"){
             this.ctx.fill();
+        }else{
+        	this.ctx.stroke();
+        	this.ctx.fill();
         }
-        
-        var bgCtx=this.board.bgCanvasContext;
-        bgCtx.beginPath();
-        bgCtx.rect(x+100,y+100,x1-x,y1-y);
-        bgCtx.fill();
-        
 		this.afterDraw();
 	}
 	
@@ -119,7 +123,7 @@
 	}
 	
 	function Circle(board){
-		this.board=board;this.ctx=this.board.canvasContext;
+		this.board=board;this.ctx=this.board.bgCanvasContext;
 	}
 	Circle.prototype=new Shap();
 	Circle.prototype.name="circle";
@@ -140,16 +144,19 @@
 		var r=Math.sqrt(Math.pow(x-x1,2)+Math.pow(y-y1,2));
         this.ctx.beginPath();
         this.ctx.arc(x,y,r,0,2*Math.PI);
-        if(this.board.settings.isStroke){
+        if(this.board.settings.fillType=="stroke"){
             this.ctx.stroke();
-        }else{
+        }else if(this.board.settings.fillType=="fill"){
             this.ctx.fill();
+        }else{
+        	this.ctx.stroke();
+        	this.ctx.fill();
         }
 		this.afterDraw();
 	}
 	
 	function Sector(board){
-		this.board=board;this.ctx=this.board.canvasContext;
+		this.board=board;this.ctx=this.board.bgCanvasContext;
 	}
 	Sector.prototype=new Shap();
 	Sector.prototype.name="sector";
@@ -174,16 +181,19 @@
         this.ctx.moveTo(x,y);
         this.ctx.arc(x,y,r,this.angle*Math.PI/180,this.percent*Math.PI/180);
 		this.ctx.closePath();
-        if(this.board.settings.isStroke){
+        if(this.board.settings.fillType=="stroke"){
             this.ctx.stroke();
-        }else{
+        }else if(this.board.settings.fillType=="fill"){
             this.ctx.fill();
+        }else{
+        	this.ctx.stroke();
+        	this.ctx.fill();
         }
 		this.afterDraw();
 	}
 	
 	function FiveStar(board){
-		this.board=board;this.ctx=this.board.canvasContext;
+		this.board=board;this.ctx=this.board.bgCanvasContext;
 	}
 	FiveStar.prototype=new Shap();
 	FiveStar.prototype.name="fiveStar";
@@ -202,7 +212,7 @@
 	FiveStar.prototype.draw=function(x,y,x1,y1){
 		this.board.initContext();
 		var r=Math.sqrt(Math.pow(x-x1,2)+Math.pow(y-y1,2));
-        var ctx=this.board.canvasContext;
+        var ctx=this.ctx;
 		ctx.save();
 		ctx.beginPath();
 		var dig=Math.PI/5*4;
@@ -217,17 +227,20 @@
 			ctx.lineTo(x+_x*r,y+_y*r);
 		}
 		ctx.lineTo(_beginX,_beginY);
-		ctx.restore();
-        if(this.board.settings.isStroke){
+        if(this.board.settings.fillType=="stroke"){
             this.ctx.stroke();
-        }else{
+        }else if(this.board.settings.fillType=="fill"){
             this.ctx.fill();
+        }else{
+        	this.ctx.stroke();
+        	this.ctx.fill();
         }
+        ctx.restore();
 		this.afterDraw();
 	}
 	
 	function Poly(board){
-		this.board=board;this.ctx=this.board.canvasContext;
+		this.board=board;this.ctx=this.board.bgCanvasContext;
 	}
 	Poly.prototype=new Shap();
 	Poly.prototype.name="poly";
@@ -259,17 +272,20 @@
             this.ctx.rotate(Math.PI*2/this.number);
             this.ctx.lineTo(nx,-ny);
         }
-        if(this.board.settings.isStroke){
+        if(this.board.settings.fillType=="stroke"){
             this.ctx.stroke();
-        }else{
+        }else if(this.board.settings.fillType=="fill"){
             this.ctx.fill();
+        }else{
+        	this.ctx.stroke();
+        	this.ctx.fill();
         }
         this.ctx.restore();
 		this.afterDraw();
 	}
 	
 	function Pen(board){
-		this.board=board;this.ctx=this.board.canvasContext;
+		this.board=board;this.ctx=this.board.bgCanvasContext;
 	}
 	Pen.prototype=new Shap();
 	Pen.prototype.name="pen";
@@ -298,7 +314,7 @@
 	}
 	
 	function Eraser(board){
-		this.board=board;this.ctx=this.board.canvasContext;
+		this.board=board;this.ctx=this.board.bgCanvasContext;
 	}
 	Eraser.prototype=new Shap();
 	Eraser.prototype.name="eraser";

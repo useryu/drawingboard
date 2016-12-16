@@ -17,18 +17,19 @@
             </ul>
 		    <div class="header">形状属性</div>
             <ul class="shaps">
-			  <li v-bind:class="{ typeactive: item.name==db.currentShap.name }" v-on:click="clickShap(db.shaps[index])" v-for="(item, index) in db.currentShap.settings">
-				{{item.chname}}
-			  </li>
+	            <div class="box linewidth" v-show="db.currentShap.name=='poly'">
+	            <span>边数</span><input type="number" name="number" v-model="db.currentShap.number" max="150" min="3">
+	            </div>
             </ul>
 		    <div class="header">通用设置</div>
             <ul name="" class="style">
-              <li v-bind:class="{ styleactive: db.settings.isStroke }" v-on:click="setStroke(true)">描&nbsp;&nbsp;&nbsp;边</li>
-              <li v-bind:class="{ styleactive: !db.settings.isStroke }" v-on:click="setStroke(false)">填&nbsp;&nbsp;&nbsp;充</li>
+              <li v-bind:class="{ styleactive: db.settings.fillType=='both' }" v-on:click="setStroke('both')">描边+填充</li>
+              <li v-bind:class="{ styleactive: db.settings.fillType=='stroke' }" v-on:click="setStroke('stroke')">描边</li>
+              <li v-bind:class="{ styleactive: db.settings.fillType=='fill' }" v-on:click="setStroke('fill')">填充</li>
             </ul>
-            <div class="box"><span>描边颜色</span></label><input type="color" name="color" v-model="db.settings.strokeColor"></div>
-            <div class="box"><span>填充颜色</span></label><input type="color" name="color" v-model="db.settings.fillColor"></div>
-            <div class="box"><span>背景颜色</span></label><input type="color" name="color" defaultValue="red" v-model="db.settings.bgColor"></div>
+            <div class=""><span>描边颜色</span><input type="color" id="strokeColor" v-model="db.settings.strokeColor"></div>
+            <div class=""><span>填充颜色</span><input type="color" id="fillColor" v-model="db.settings.fillColor"></div>
+            <div class=""><span>背景颜色</span><input type="color" id="bgColor" defaultValue="red" v-model="db.settings.bgColor"></div>
             <div class="box linewidth"><span>线宽</span><input type="number" name="number" v-model="db.settings.lineSize" max="150" min="1"></div>
             <div class="space"></div>
 			
@@ -50,8 +51,11 @@
 			 </div>
         </div>
     </div>
+    <div id="pans">
+    <div id="border" style="z-index:5;border:1px solid gray;width:1px;height:1px;" draggable="true"></div>
     <canvas width="1070" height="648" id="bgpan" style="z-index:10;"></canvas>
     <canvas width="1070" height="648" id="pan" style="z-index:11;"></canvas>
+    </div>
 </span>
 </body>
 <script src="js/shaps.js"></script>

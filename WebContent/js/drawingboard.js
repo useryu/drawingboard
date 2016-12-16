@@ -1,18 +1,19 @@
 
 
-function DrawingBoard(settings,canvas,bgCanvas){
+function DrawingBoard(settings,canvas,bgCanvas,border){
 	
 	//default settings
 	this.settings={};
-    this.settings.fillColor=settings.fillColor || "#000";
-    this.settings.strokeColor=settings.strokeColor || "#f00";
-    this.settings.bgColor=settings.bgColor || "#fff";
+    this.settings.fillColor=settings.fillColor || "#000000";
+    this.settings.strokeColor=settings.strokeColor || "#ff0000";
+    this.settings.bgColor=settings.bgColor || "#000000";
     this.settings.lineSize=settings.lineSize || 1;
-	this.settings.isStroke=settings.isStroke || true;
+	this.settings.fillType=settings.fillType || "both";//both, fill, stroke
 	
 	//find canvas object, get context2d object
 	this.canvas=canvas;
 	this.bgCanvas=bgCanvas;
+	this.border=border;
     var screenWidth=document.documentElement.clientWidth;
     var screenHeight=document.documentElement.clientHeight;
 	this.width=screenWidth-295;
@@ -31,6 +32,9 @@ function DrawingBoard(settings,canvas,bgCanvas){
 		this.canvasContext.strokeStyle=this.settings.strokeColor;
 		this.canvasContext.fillStyle=this.settings.fillColor;
 		this.canvasContext.lineWidth=this.settings.lineSize;
+		this.bgCanvasContext.strokeStyle=this.settings.strokeColor;
+		this.bgCanvasContext.fillStyle=this.settings.fillColor;
+		this.bgCanvasContext.lineWidth=this.settings.lineSize;
 	}
 	var line=new Line(this);
 	var rect=new Rect(this);
@@ -41,7 +45,7 @@ function DrawingBoard(settings,canvas,bgCanvas){
 	var pen=new Pen(this);
 	var eraser=new Eraser(this);
 	var selector=new Selector(this);
-	this.shaps=[line,rect,circle,sector,fiveStar,poly,pen,eraser,selector];
+	this.shaps=[line,rect,circle,sector,fiveStar,poly,pen,eraser];
 	this.currentShap=line;
 	
 	//init action buttons
@@ -62,7 +66,7 @@ function DrawingBoard(settings,canvas,bgCanvas){
 	Create.prototype.chname="新建";
 	Create.prototype.selected=function(){
 		this.board.hist=[];
-		this.board.canvasContext.clearRect(0,0,this.board.width,this.board.height);
+		this.board.bgCanvasContext.clearRect(0,0,this.board.width,this.board.height);
 	}
 	
 	function Clear(board){
@@ -73,7 +77,7 @@ function DrawingBoard(settings,canvas,bgCanvas){
 	Clear.prototype.chname="清除";
 	Clear.prototype.selected=function(){
 		this.board.hist=[];
-		this.board.canvasContext.clearRect(0,0,this.board.width,this.board.height);
+		this.board.bgCanvasContext.clearRect(0,0,this.board.width,this.board.height);
 	}
 	
 	function Undo(board){
@@ -87,9 +91,9 @@ function DrawingBoard(settings,canvas,bgCanvas){
 		if(arr.length>0){
 			var undoItem = arr.pop();
 			this.board.redo.push(undoItem);
-			this.board.canvasContext.clearRect(0,0,this.board.width,this.board.height);
+			this.board.bgCanvasContext.clearRect(0,0,this.board.width,this.board.height);
 			if(arr.length>0){
-				this.board.canvasContext.putImageData(arr[arr.length-1],0,0,0,0,this.board.width,this.board.height);
+				this.board.bgCanvasContext.putImageData(arr[arr.length-1],0,0,0,0,this.board.width,this.board.height);
 			}
 		}
 	}
@@ -105,8 +109,8 @@ function DrawingBoard(settings,canvas,bgCanvas){
 		if(arr.length>0){
 			var redoItem = arr.pop();
 			this.board.hist.push(redoItem);
-			this.board.canvasContext.clearRect(0,0,this.board.width,this.board.height);
-			this.board.canvasContext.putImageData(redoItem,0,0,0,0,this.board.width,this.board.height);
+			this.board.bgCanvasContext.clearRect(0,0,this.board.width,this.board.height);
+			this.board.bgCanvasContext.putImageData(redoItem,0,0,0,0,this.board.width,this.board.height);
 		}
 	}
 	
@@ -119,23 +123,6 @@ function DrawingBoard(settings,canvas,bgCanvas){
 	Save.prototype.selected=function(){
 		var reg=this.board.canvas.toDataURL("image/png");
 		location.href=reg;
-	}
-	
-	function Select(board){
-		this.board=board;
-	}
-	Select.prototype=new Action();
-	Select.prototype.name="Select";
-	Select.prototype.chname="选择";
-	Select.prototype.selected=function(){
-		this.board.initContext();
-        this.board.canvasContext.save();
-        this.board.canvasContext.setLineDash([4,2]);
-        this.board.canvasContext.beginPath();
-        this.board.canvasContext.lineWidth=1;
-        this.board.canvasContext.rect(x,y,x1-x,y1-y);
-        this.board.canvasContext.stroke();
-        this.board.canvasContext.restore();
 	}
 	
 	function Cut(board){
@@ -163,10 +150,22 @@ function DrawingBoard(settings,canvas,bgCanvas){
 	var clear = new Clear(this);
 	var undo = new Undo(this);
 	var redo = new Redo(this);
-	var selectAction = new Select(this);
 	var save = new Save(this);
 	var cut = new Cut(this);
 	var copy = new Copy(this);
-	this.actions=[create,clear,undo,redo,save,selectAction,cut,copy];
+	this.actions=[create,clear,undo,redo,save];
 
+    this.createRectDiv = function(id, x, y, w, h) {
+        var newDom = document.createElement("div");
+        newDom.style.position = 'absolute';
+        newDom.style.border = '1px solid gray';
+        newDom.style.left = x;
+        newDom.style.top = y;
+        newDom.style.width = w + 'px';
+        newDom.style.height = h + 'px';
+        newDom.width = w;
+        newDom.height = h;
+        newDom.setAttribute('data-zr-dom-id', id);
+        return newDom;
+    }
 }

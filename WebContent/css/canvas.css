@@ -13,7 +13,17 @@ ul{ padding-left: 10px }
 	text-align:center;
 	background-color:;
 }
-canvas{ position: fixed; left: 280px; top: 5px; display: block; cursor: pointer; background-color: #FFFFFF; border: 1px solid #CCCCCC; }
+
+canvas {
+	position: fixed;
+	left: 280px;
+	top: 5px;
+	display: block;
+	cursor: pointer;
+	border: 1px solid #CCCCCC;
+	background-color: transparent;
+}
+
 .container{
 	width:250px;
 	height:60px;
@@ -320,6 +330,19 @@ canvas{ position: fixed; left: 280px; top: 5px; display: block; cursor: pointer;
 	color:#fff;
 	transition:all 0.3s;
 }
+input[type="color"] { width:44px; height:23px; border: 0; padding: 0; background-color: #eee;}
+::-webkit-color-swatch-wrapper {
+    border: 1px solid #777;
+    background-image: -webkit-gradient(linear, 0 0, 100% 0, 
+        from(red), 
+        color-stop(15%, orange), 
+        color-stop(30%, yellow), 
+        color-stop(50%, green), 
+        color-stop(65%, darkcyan), 
+        color-stop(80%, blue), 
+        to(purple));
+}
+::-webkit-color-swatch { height:21px; position:relative; left: 40px; top:-5px; }
 .box input{
 	float:left;
 	width:45px;

@@ -121,7 +121,7 @@ function DrawingBoard(settings,canvas,bgCanvas,border){
 	Save.prototype.name="Save";
 	Save.prototype.chname="保存";
 	Save.prototype.selected=function(){
-		var reg=this.board.canvas.toDataURL("image/png");
+		var reg=this.board.bgCanvas.toDataURL("image/png");
 		location.href=reg;
 	}
 	
